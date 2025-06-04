@@ -24,7 +24,7 @@ class Lidar(Sensor):
     Actor implementation details for lidars
     """
 
-    def __init__(self, uid, name, parent, relative_spawn_pose, node, carla_actor, synchronous_mode):
+    def __init__(self, uid, name, parent, relative_spawn_pose, node, carla_actor, synchronous_mode, publish_sensor_tf):
         """
         Constructor
 
@@ -49,7 +49,8 @@ class Lidar(Sensor):
                                     relative_spawn_pose=relative_spawn_pose,
                                     node=node,
                                     carla_actor=carla_actor,
-                                    synchronous_mode=synchronous_mode)
+                                    synchronous_mode=synchronous_mode,
+                                    publish_sensor_tf=publish_sensor_tf)
 
         self.lidar_publisher = node.new_publisher(PointCloud2,
                                                   self.get_topic_prefix(),

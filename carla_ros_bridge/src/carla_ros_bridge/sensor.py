@@ -57,6 +57,7 @@ class Sensor(Actor):
                  node,
                  carla_actor,
                  synchronous_mode,
+                 publish_sensor_tf=True,
                  is_event_sensor=False,  # only relevant in synchronous_mode:
                  # if a sensor only delivers data on special events,
                  # do not wait for it. That means you might get data from a
@@ -90,6 +91,7 @@ class Sensor(Actor):
 
         self.relative_spawn_pose = relative_spawn_pose
         self.synchronous_mode = synchronous_mode
+        self.publish_sensor_tf = publish_sensor_tf
         self.queue = queue.Queue()
         self.next_data_expected_time = None
         self.sensor_tick_time = None
@@ -139,6 +141,8 @@ class Sensor(Actor):
         return transform
 
     def publish_tf(self, pose, timestamp):
+        if not self.publish_sensor_tf:
+            return
         transform = self.get_ros_transform(pose, timestamp)
         try:
             self._tf_broadcaster.sendTransform(transform)

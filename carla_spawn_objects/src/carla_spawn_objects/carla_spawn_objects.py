@@ -232,12 +232,16 @@ class CarlaSpawnObjects(CompatibleNode):
                             spawn_point.pop("pitch", 0.0),
                             spawn_point.pop("yaw", 0.0))
 
+                publish_transform = bool(sensor_spec.pop("publish_transform", True))
+
+
                 spawn_object_request = roscomp.get_service_request(SpawnObject)
                 spawn_object_request.type = sensor_type
                 spawn_object_request.id = sensor_id
                 spawn_object_request.attach_to = attached_vehicle_id if attached_vehicle_id is not None else 0
                 spawn_object_request.transform = sensor_transform
                 spawn_object_request.random_pose = False  # never set a random pose for a sensor
+                spawn_object_request.publish_sensor_transform = publish_transform
 
                 attached_objects = []
                 for attribute, value in sensor_spec.items():
@@ -272,7 +276,8 @@ class CarlaSpawnObjects(CompatibleNode):
                     "Sensor {} will not be spawned: {}".format(sensor_name, e))
                 continue
 
-            except NameError:
+            except NameError as e:
+                print(e)
                 self.logerr("Sensor rolename '{}' is only allowed to be used once. The second one will be ignored.".format(
                     sensor_id))
                 continue

@@ -253,8 +253,10 @@ class ActorFactory(object):
         name = carla_actor.attributes.get("role_name", "")
         if not name:
             name = str(carla_actor.id)
+
+        publish_sensor_transform = req.publish_sensor_transform if req is not None and hasattr(req, 'publish_sensor_transform') else True
         obj = self._create_object(carla_actor.id, carla_actor.type_id, name,
-                                  parent_id, relative_transform, carla_actor)
+                                  parent_id, relative_transform, carla_actor, publish_sensor_transform)
         return obj
 
     def _destroy_object(self, actor_id, delete_actor):
@@ -277,7 +279,7 @@ class ActorFactory(object):
                 pseudo_sensors.append(cls.get_blueprint_name())
         return pseudo_sensors
 
-    def _create_object(self, uid, type_id, name, attach_to, spawn_pose, carla_actor=None):
+    def _create_object(self, uid, type_id, name, attach_to, spawn_pose, carla_actor=None, publish_sensor_transform=True):
         # check that the actor is not already created.
         if carla_actor is not None and carla_actor.id in self.actors:
             return None
@@ -387,7 +389,7 @@ class ActorFactory(object):
             elif carla_actor.type_id.startswith("sensor.lidar"):
                 if carla_actor.type_id.endswith("sensor.lidar.ray_cast"):
                     actor = Lidar(uid, name, parent, spawn_pose, self.node,
-                                  carla_actor, self.sync_mode)
+                                  carla_actor, self.sync_mode, publish_sensor_transform)
                 elif carla_actor.type_id.endswith(
                         "sensor.lidar.ray_cast_semantic"):
                     actor = SemanticLidar(uid, name, parent, spawn_pose,
